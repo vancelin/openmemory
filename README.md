@@ -158,6 +158,52 @@ OpenMemory exposes these tools to all connected agents:
 | `openmemory_reinforce` | Boost salience of a memory |
 | `openmemory_delete` | Delete a memory by ID |
 
+## Usage
+
+Once OpenMemory is running, all three CLIs can store and search memories through the MCP tools. Just ask naturally:
+
+### Storing Memories
+
+```
+You: Remember that I prefer dark mode in all editors
+Claude: *calls openmemory_store* → Stored!
+```
+
+```
+You: 我喜歡用 Python 寫後端，前端用 React
+Gemini: *calls openmemory_store* → Stored!
+```
+
+```
+You: Note that the production DB port is 5433, not 5432
+Codex: *calls openmemory_store* → Stored!
+```
+
+### Searching Memories
+
+```
+You: What's my editor preference?
+Claude: *calls openmemory_query("editor preference")* → "You prefer dark mode in all editors"
+```
+
+```
+You: 生產環境的 DB port 是多少？
+Gemini: *calls openmemory_query("production DB port")* → "5433"
+```
+
+### Cross-Tool Recall
+
+```
+# Stored in Claude Code
+You (Claude): Remember my project uses PostgreSQL 16
+
+# Recalled in Gemini CLI
+You (Gemini): What database does my project use?
+Gemini: *calls openmemory_query* → "Your project uses PostgreSQL 16"
+```
+
+That's it — memories stored in one CLI are instantly available in all others.
+
 ## Environment Variables
 
 | Variable | Default | Description |
@@ -344,6 +390,52 @@ OpenMemory 向所有連線的 Agent 提供以下工具：
 | `openmemory_get` | 依 ID 取得單筆記憶 |
 | `openmemory_reinforce` | 提升記憶的顯著性 |
 | `openmemory_delete` | 依 ID 刪除記憶 |
+
+## 使用方式
+
+OpenMemory 啟動後，三個 CLI 都可以透過 MCP 工具儲存和搜尋記憶。直接用自然語言即可：
+
+### 儲存記憶
+
+```
+你: 記住我所有編輯器都偏好暗色模式
+Claude: *呼叫 openmemory_store* → 已儲存！
+```
+
+```
+你: 我喜歡用 Python 寫後端，前端用 React
+Gemini: *呼叫 openmemory_store* → 已儲存！
+```
+
+```
+你: 記一下 production DB port 是 5433，不是 5432
+Codex: *呼叫 openmemory_store* → 已儲存！
+```
+
+### 搜尋記憶
+
+```
+你: 我的編輯器偏好是什麼？
+Claude: *呼叫 openmemory_query("編輯器偏好")* → "你所有編輯器都偏好暗色模式"
+```
+
+```
+你: 生產環境的 DB port 是多少？
+Gemini: *呼叫 openmemory_query("production DB port")* → "5433"
+```
+
+### 跨工具記憶共享
+
+```
+# 在 Claude Code 中儲存
+你 (Claude): 記住我的專案使用 PostgreSQL 16
+
+# 在 Gemini CLI 中讀取
+你 (Gemini): 我的專案用什麼資料庫？
+Gemini: *呼叫 openmemory_query* → "你的專案使用 PostgreSQL 16"
+```
+
+就這樣 — 在任何一個 CLI 儲存的記憶，其他 CLI 都能立即讀取。
 
 ## 環境變數
 
