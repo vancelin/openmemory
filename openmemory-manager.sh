@@ -47,6 +47,8 @@ _om_ref_incr() {
 _om_ref_decr() {
     local count=0
     [[ -f "$OM_REF_FILE" ]] && count=$(< "$OM_REF_FILE" 2>/dev/null)
+    # Don't decrement if already 0 (prevents manual starts from being killed)
+    [[ "$count" -le 0 ]] && return 0
     count=$((count - 1))
     if [[ "$count" -le 0 ]]; then
         echo 0 > "$OM_REF_FILE"
