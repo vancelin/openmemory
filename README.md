@@ -204,6 +204,16 @@ Gemini: *calls openmemory_query* → "Your project uses PostgreSQL 16"
 
 That's it — memories stored in one CLI are instantly available in all others.
 
+## Screenshots
+
+**Claude Code** — storing and querying memories via OpenMemory MCP tools:
+
+![Claude Code](claudecode.png)
+
+**Gemini CLI** — reading memories stored by other agents:
+
+![Gemini CLI](gemini.png)
+
 ## Environment Variables
 
 | Variable | Default | Description |
@@ -436,6 +446,16 @@ Gemini: *呼叫 openmemory_query* → "你的專案使用 PostgreSQL 16"
 ```
 
 就這樣 — 在任何一個 CLI 儲存的記憶，其他 CLI 都能立即讀取。
+
+## 示意圖
+
+**Claude Code** — 透過 OpenMemory MCP 工具儲存和查詢記憶：
+
+![Claude Code](claudecode.png)
+
+**Gemini CLI** — 讀取其他 Agent 儲存的記憶：
+
+![Gemini CLI](gemini.png)
 
 ## 環境變數
 
