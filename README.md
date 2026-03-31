@@ -4,6 +4,8 @@
 
 Share long-term memory across all your AI agents — no manual start/stop needed.
 
+![OpenMemory Banner](openmemory-banner.png)
+
 [**繁體中文**](#繁體中文版)
 
 ---
@@ -250,6 +252,8 @@ MIT
 > 跨 Claude Code、Codex CLI、Gemini CLI 自動啟動/關閉 [OpenMemory](https://github.com/CaviraOSS/OpenMemory) MCP 記憶伺服器。
 
 讓所有 AI Agent 共用長期記憶 — 無需手動啟停。
+
+![OpenMemory Banner](openmemory-banner.png)
 
 ## 運作原理
 

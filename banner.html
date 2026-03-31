@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1280px; height: 640px; overflow: hidden; background: #0a0a0f; font-family: -apple-system, 'Segoe UI', sans-serif; }
+
+.bg-glow {
+  position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.3;
+}
+.g1 { width: 500px; height: 500px; background: #6366f1; top: -100px; left: -100px; }
+.g2 { width: 400px; height: 400px; background: #06b6d4; bottom: -80px; right: -80px; }
+.g3 { width: 300px; height: 300px; background: #8b5cf6; top: 200px; right: 300px; opacity: 0.15; }
+
+.container {
+  position: relative; z-index: 1; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px;
+}
+
+.logo-row {
+  display: flex; align-items: center; gap: 20px; margin-bottom: 32px;
+}
+
+.brain-icon {
+  width: 80px; height: 80px; position: relative;
+}
+
+.brain-icon svg { width: 100%; height: 100%; }
+
+h1 {
+  font-size: 56px; font-weight: 800; color: #fff; letter-spacing: -1px;
+}
+h1 span { color: #818cf8; }
+
+.tagline {
+  font-size: 22px; color: #94a3b8; margin-top: 12px; text-align: center;
+  line-height: 1.6;
+}
+
+.tools-row {
+  display: flex; gap: 24px; margin-top: 48px;
+}
+
+.tool-badge {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 16px 28px;
+  backdrop-filter: blur(10px);
+}
+
+.tool-badge .icon {
+  width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700;
+}
+
+.tool-badge.claude .icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.tool-badge.codex .icon { background: linear-gradient(135deg, #059669, #10b981); }
+.tool-badge.gemini .icon { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+
+.tool-badge .name { color: #e2e8f0; font-size: 17px; font-weight: 600; }
+
+.features {
+  display: flex; gap: 32px; margin-top: 44px;
+}
+
+.feat {
+  display: flex; align-items: center; gap: 8px;
+  color: #64748b; font-size: 15px;
+}
+
+.feat-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #818cf8;
+}
+
+.bottom-bar {
+  position: absolute; bottom: 40px; display: flex; gap: 8px; align-items: center;
+}
+.bottom-bar span {
+  color: #475569; font-size: 13px; font-family: monospace;
+}
+</style>
+</head>
+<body>
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="bg-glow g3"></div>
+
+  <div class="container">
+    <div class="logo-row">
+      <div class="brain-icon">
+        <svg viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="36" stroke="#818cf8" stroke-width="2" opacity="0.4"/>
+          <circle cx="40" cy="40" r="24" stroke="#818cf8" stroke-width="1.5" opacity="0.3"/>
+          <path d="M28 32 C28 24 40 20 40 28 C40 20 52 24 52 32 C52 44 40 52 40 52 C40 52 28 44 28 32Z" fill="url(#g)" opacity="0.9"/>
+          <path d="M40 28 L40 52" stroke="#c7d2fe" stroke-width="1" opacity="0.5"/>
+          <path d="M32 36 L48 36" stroke="#c7d2fe" stroke-width="1" opacity="0.4"/>
+          <path d="M34 42 L46 42" stroke="#c7d2fe" stroke-width="1" opacity="0.3"/>
+          <circle cx="40" cy="40" r="2" fill="#e0e7ff"/>
+          <defs>
+            <linearGradient id="g" x1="28" y1="20" x2="52" y2="52">
+              <stop offset="0%" stop-color="#818cf8"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1>Open<span>Memory</span></h1>
+    </div>
+
+    <div class="tagline">
+      Shared long-term memory for all your AI agents<br>
+      Auto start/stop — zero config — no API keys
+    </div>
+
+    <div class="tools-row">
+      <div class="tool-badge claude">
+        <div class="icon">C</div>
+        <div class="name">Claude Code</div>
+      </div>
+      <div class="tool-badge codex">
+        <div class="icon">Cx</div>
+        <div class="name">Codex CLI</div>
+      </div>
+      <div class="tool-badge gemini">
+        <div class="icon">G</div>
+        <div class="name">Gemini CLI</div>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feat"><div class="feat-dot"></div>Reference counting lifecycle</div>
+      <div class="feat"><div class="feat-dot"></div>Synthetic embeddings</div>
+      <div class="feat"><div class="feat-dot"></div>SQLite vector store</div>
+      <div class="feat"><div class="feat-dot"></div>MCP protocol</div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>github.com/vancelin/openmemory</span>
+    </div>
+  </div>
+</body>
+</html>
