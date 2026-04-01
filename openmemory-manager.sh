@@ -14,7 +14,7 @@ OM_PORT="${OPENMEMORY_PORT:-8080}"
 
 # ── Start OpenMemory if not already running ──
 _om_ensure_running() {
-    if curl -sf "http://localhost:${OM_PORT}/health" >/ /dev/null 2>&1; then
+    if curl -sf "http://localhost:${OM_PORT}/health" > /dev/null 2>&1; then
         return 0
     fi
 
@@ -26,7 +26,7 @@ _om_ensure_running() {
     local i
     for i in {1..15}; do
         if curl -sf "http://localhost:${OM_PORT}/health" > /dev/null 2>&1; then
-            echo "OpenMemory started (pid: $(lsof -ti :${OM_PORT} 2>/dev/null || echo '')"
+            echo "OpenMemory started (pid: $(lsof -ti :${OM_PORT} 2>/dev/null || echo ''))"
             return 0
         fi
         sleep 1
@@ -80,4 +80,3 @@ _om_reset_if_stale() {
         echo 0 > "$OM_REF_FILE"
     fi
 }
-
