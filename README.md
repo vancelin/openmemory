@@ -1,6 +1,6 @@
 # OpenMemory Auto Manager
 
-> Auto start/stop [OpenMemory](https://github.com/CaviraOSS/OpenMemory) MCP server across Claude Code, Codex CLI, and Gemini CLI.
+> Auto start/stop [OpenMemory](https://github.com/CaviraOSS/OpenMemory) MCP server across Claude Code, OpenCode, Codex CLI, and Gemini CLI.
 
 Share long-term memory across all your AI agents — no manual start/stop needed.
 
@@ -13,12 +13,14 @@ Share long-term memory across all your AI agents — no manual start/stop needed
 ## How It Works
 
 ```
-Terminal 1: type claude   → OpenMemory auto-starts (refcount = 1)
-Terminal 2: type gemini   → shares same server    (refcount = 2)
-Terminal 3: type codex    → shares same server    (refcount = 3)
-Terminal 1: exits         → still running         (refcount = 2)
-Terminal 2: exits         → still running         (refcount = 1)
-Terminal 3: exits         → auto stops            (refcount = 0)
+Terminal 1: type claude    → OpenMemory auto-starts (refcount = 1)
+Terminal 2: type opencode   → shares same server    (refcount = 2)
+Terminal 3: type gemini    → shares same server    (refcount = 3)
+Terminal 4: type codex     → shares same server    (refcount = 4)
+Terminal 1: exits          → still running         (refcount = 3)
+Terminal 2: exits          → still running         (refcount = 2)
+Terminal 3: exits          → still running         (refcount = 1)
+Terminal 4: exits          → auto stops            (refcount = 0)
 ```
 
 Reference counting ensures OpenMemory only runs when needed and shuts down when the last session closes.
@@ -26,41 +28,42 @@ Reference counting ensures OpenMemory only runs when needed and shuts down when 
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                    Your Machine                       │
-│                                                      │
-│  ┌─────────────┐  ┌────────────┐  ┌──────────────┐  │
-│  │ Claude Code  │  │ Gemini CLI │  │  Codex CLI   │  │
-│  │             │  │            │  │              │  │
-│  │ HTTP MCP ───┼──┼── HTTP MCP │  │ STDIO only   │  │
-│  └─────────────┘  └────────────┘  │              │  │
-│         │                │         │  Python Proxy │  │
-│         │                │         │  STDIO→HTTP   │  │
-│         ▼                ▼         └──────┬───────┘  │
-│  ┌──────────────────────────────────────────┐        │
-│  │       OpenMemory MCP Server              │        │
-│  │       localhost:8080                      │        │
-│  │                                          │        │
-│  │  • Synthetic embeddings (no API keys)    │        │
-│  │  • SQLite vector store                   │        │
-│  │  • HSG tiered memory architecture        │        │
-│  │  • MCP tools: store, query, list, delete │        │
-│  └──────────────────────────────────────────┘        │
-│                                                      │
-│  Lifecycle managed by openmemory-manager.sh          │
-│  ┌──────────────────────────────┐                    │
-│  │ _om_ensure_running()         │                    │
-│  │ _om_ref_incr() / _om_decr() │                    │
-│  │ zshexit cleanup hook         │                    │
-│  └──────────────────────────────┘                    │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                    Your Machine                               │
+│                                                              │
+│  ┌─────────────┐  ┌────────────┐  ┌──────────────┐  ┌──────┐ │
+│  │ Claude Code  │  │ OpenCode   │  │ Gemini CLI   │  │ Codex│ │
+│  │             │  │            │  │              │  │ CLI  │ │
+│  │ HTTP MCP ───┼──┼── HTTP MCP │──┼── HTTP MCP   │  │STDIO │ │
+│  └─────────────┘  └────────────┘  └──────────────┘  │ only │ │
+│         │                │                │         │      │ │
+│         │                │                │         │Python│ │
+│         │                │                │         │Proxy │ │
+│         ▼                ▼                ▼         └──┬───┘ │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │       OpenMemory MCP Server                         │    │
+│  │       localhost:8080                                 │    │
+│  │                                                      │    │
+│  │  • Synthetic embeddings (no API keys)               │    │
+│  │  • SQLite vector store                              │    │
+│  │  • HSG tiered memory architecture                   │    │
+│  │  • MCP tools: store, query, list, delete            │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                              │
+│  Lifecycle managed by openmemory-manager.sh                  │
+│  ┌────────────────────────────────┐                          │
+│  │ _om_ensure_running()           │                          │
+│  │ _om_ref_incr() / _om_decr()   │                          │
+│  │ zshexit cleanup hook           │                          │
+│  └────────────────────────────────┘                          │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
 
 - **Zero config** — no API keys, no Docker, no external services
 - **Auto lifecycle** — server starts on first CLI launch, stops when all terminals close
-- **Cross-tool memory** — Claude Code, Codex CLI, and Gemini CLI share the same memory store
+- **Cross-tool memory** — Claude Code, OpenCode, Codex CLI, and Gemini CLI share the same memory store
 - **Codex STDIO bridge** — Python proxy translates STDIO MCP to HTTP MCP for Codex CLI
 - **Reference counting** — safe multi-terminal usage with automatic cleanup
 - **Stale recovery** — resets counter if server crashes unexpectedly
@@ -96,7 +99,7 @@ chmod +x install.sh openmemory-manager.sh openmemory-codex-proxy.py
 ./install.sh
 ```
 
-Restart your terminal, then run `claude`, `codex`, or `gemini` — OpenMemory starts automatically.
+Restart your terminal, then run `claude`, `opencode`, `codex`, or `gemini` — OpenMemory starts automatically.
 
 ## Files
 
@@ -105,13 +108,14 @@ Restart your terminal, then run `claude`, `codex`, or `gemini` — OpenMemory st
 | `openmemory-manager.sh` | Core lifecycle manager — start/stop with reference counting |
 | `openmemory-codex-proxy.py` | FastMCP STDIO→HTTP proxy for Codex CLI |
 | `install.sh` | One-command shell hook installer (idempotent) |
-| `.mcp.json` | Claude Code MCP config (HTTP transport) |
+| `.mcp.json` | Claude Code / OpenCode MCP config (HTTP transport) |
+| `.mcp.json.example` | Example MCP config for reference |
 
 ## MCP Configuration
 
-### Claude Code — `.mcp.json`
+### Claude Code / OpenCode — `.mcp.json`
 
-Place in project root or `~/.claude/.mcp.json` for global access:
+Place in project root or `~/.claude/.mcp.json` (Claude Code) / `~/.opencode/.mcp.json` (OpenCode) for global access:
 
 ```json
 {
@@ -123,6 +127,8 @@ Place in project root or `~/.claude/.mcp.json` for global access:
   }
 }
 ```
+
+**Note:** OpenCode supports the same `.mcp.json` format as Claude Code for MCP server configuration.
 
 ### Gemini CLI — `~/.gemini/settings.json`
 
@@ -249,7 +255,7 @@ MIT
 
 # OpenMemory 自動管理器
 
-> 跨 Claude Code、Codex CLI、Gemini CLI 自動啟動/關閉 [OpenMemory](https://github.com/CaviraOSS/OpenMemory) MCP 記憶伺服器。
+> 跨 Claude Code、OpenCode、Codex CLI、Gemini CLI 自動啟動/關閉 [OpenMemory](https://github.com/CaviraOSS/OpenMemory) MCP 記憶伺服器。
 
 讓所有 AI Agent 共用長期記憶 — 無需手動啟停。
 
@@ -258,12 +264,14 @@ MIT
 ## 運作原理
 
 ```
-終端機 1: 輸入 claude   → OpenMemory 自動啟動  (refcount = 1)
-終端機 2: 輸入 gemini   → 共用同一個伺服器      (refcount = 2)
-終端機 3: 輸入 codex    → 共用同一個伺服器      (refcount = 3)
-終端機 1: 關閉          → 仍然運行             (refcount = 2)
-終端機 2: 關閉          → 仍然運行             (refcount = 1)
-終端機 3: 關閉          → 自動停止             (refcount = 0)
+終端機 1: 輸入 claude    → OpenMemory 自動啟動  (refcount = 1)
+終端機 2: 輸入 opencode   → 共用同一個伺服器      (refcount = 2)
+終端機 3: 輸入 gemini    → 共用同一個伺服器      (refcount = 3)
+終端機 4: 輸入 codex     → 共用同一個伺服器      (refcount = 4)
+終端機 1: 關閉           → 仍然運行             (refcount = 3)
+終端機 2: 關閉           → 仍然運行             (refcount = 2)
+終端機 3: 關閉           → 仍然運行             (refcount = 1)
+終端機 4: 關閉           → 自動停止             (refcount = 0)
 ```
 
 參考計數機制確保 OpenMemory 只在需要時運行，最後一個終端機關閉時自動停止。
@@ -271,41 +279,41 @@ MIT
 ## 架構
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                      你的電腦                         │
-│                                                      │
-│  ┌─────────────┐  ┌────────────┐  ┌──────────────┐  │
-│  │ Claude Code  │  │ Gemini CLI │  │  Codex CLI   │  │
-│  │             │  │            │  │              │  │
-│  │ HTTP MCP ───┼──┼── HTTP MCP │  │ 僅支援 STDIO  │  │
-│  └─────────────┘  └────────────┘  │              │  │
-│         │                │         │  Python Proxy │  │
-│         │                │         │  STDIO→HTTP   │  │
-│         ▼                ▼         └──────┬───────┘  │
-│  ┌──────────────────────────────────────────┐        │
-│  │       OpenMemory MCP 伺服器              │        │
-│  │       localhost:8080                      │        │
-│  │                                          │        │
-│  │  • 合成式嵌入（不需要 API Key）          │        │
-│  │  • SQLite 向量資料庫                     │        │
-│  │  • HSG 分層記憶架構                      │        │
-│  │  • MCP 工具：儲存、查詢、列表、刪除      │        │
-│  └──────────────────────────────────────────┘        │
-│                                                      │
-│  生命週期由 openmemory-manager.sh 管理                │
-│  ┌──────────────────────────────┐                    │
-│  │ _om_ensure_running()         │                    │
-│  │ _om_ref_incr() / _om_decr() │                    │
-│  │ zshexit 清理鉤子             │                    │
-│  └──────────────────────────────┘                    │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                      你的電腦                                 │
+│                                                              │
+│  ┌─────────────┐  ┌────────────┐  ┌──────────────┐  ┌──────┐ │
+│  │ Claude Code  │  │ OpenCode   │  │ Gemini CLI   │  │ Codex│ │
+│  │             │  │            │  │              │  │ CLI  │ │
+│  │ HTTP MCP ───┼──┼── HTTP MCP │──┼── HTTP MCP   │  │僅STDIO│ │
+│  └─────────────┘  └────────────┘  └──────────────┘  │      │ │
+│         │                │                │         │Python│ │
+│         │                │                │         │Proxy │ │
+│         ▼                ▼                ▼         └──┬───┘ │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │       OpenMemory MCP 伺服器                         │    │
+│  │       localhost:8080                                 │    │
+│  │                                                      │    │
+│  │  • 合成式嵌入（不需要 API Key）                      │    │
+│  │  • SQLite 向量資料庫                                 │    │
+│  │  • HSG 分層記憶架構                                  │    │
+│  │  • MCP 工具：儲存、查詢、列表、刪除                  │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                              │
+│  生命週期由 openmemory-manager.sh 管理                        │
+│  ┌────────────────────────────────┐                          │
+│  │ _om_ensure_running()           │                          │
+│  │ _om_ref_incr() / _om_decr()   │                          │
+│  │ zshexit 清理鉤子               │                          │
+│  └────────────────────────────────┘                          │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## 特色
 
 - **零設定** — 不需要 API Key、不需要 Docker、不需要外部服務
 - **自動生命週期** — 第一個 CLI 啟動時伺服器啟動，所有終端機關閉時自動停止
-- **跨工具記憶** — Claude Code、Codex CLI、Gemini CLI 共用同一個記憶庫
+- **跨工具記憶** — Claude Code、OpenCode、Codex CLI、Gemini CLI 共用同一個記憶庫
 - **Codex STDIO 橋接** — Python Proxy 將 STDIO MCP 轉譯為 HTTP MCP，解決 Codex 僅支援 STDIO 的限制
 - **參考計數** — 安全的多終端機使用，自動清理
 - **崩潰復原** — 伺服器意外停止時自動重置計數器
@@ -341,7 +349,7 @@ chmod +x install.sh openmemory-manager.sh openmemory-codex-proxy.py
 ./install.sh
 ```
 
-重新啟動終端機後，執行 `claude`、`codex` 或 `gemini` — OpenMemory 會自動啟動。
+重新啟動終端機後，執行 `claude`、`opencode`、`codex` 或 `gemini` — OpenMemory 會自動啟動。
 
 ## 檔案說明
 
@@ -350,13 +358,14 @@ chmod +x install.sh openmemory-manager.sh openmemory-codex-proxy.py
 | `openmemory-manager.sh` | 核心生命週期管理器 — 參考計數的啟動/停止 |
 | `openmemory-codex-proxy.py` | FastMCP STDIO→HTTP Proxy，供 Codex CLI 使用 |
 | `install.sh` | 一鍵安裝 Shell 鉤子（冪等設計） |
-| `.mcp.json` | Claude Code MCP 設定（HTTP 傳輸） |
+| `.mcp.json` | Claude Code / OpenCode MCP 設定（HTTP 傳輸） |
+| `.mcp.json.example` | MCP 設定範例檔案 |
 
 ## MCP 設定
 
-### Claude Code — `.mcp.json`
+### Claude Code / OpenCode — `.mcp.json`
 
-放在專案根目錄，或 `~/.claude/.mcp.json` 設為全域：
+放在專案根目錄，或 `~/.claude/.mcp.json`（Claude Code）/ `~/.opencode/.mcp.json`（OpenCode）設為全域：
 
 ```json
 {
@@ -368,6 +377,8 @@ chmod +x install.sh openmemory-manager.sh openmemory-codex-proxy.py
   }
 }
 ```
+
+**注意：** OpenCode 支援與 Claude Code 相同的 `.mcp.json` 格式來設定 MCP 伺服器。
 
 ### Gemini CLI — `~/.gemini/settings.json`
 
