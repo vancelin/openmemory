@@ -50,9 +50,10 @@ _om_wrap() {
   return \$ret
 }
 
-claude()  { _om_wrap claude  "\$@"; }
-codex()   { _om_wrap codex   "\$@"; }
-gemini()  { _om_wrap gemini  "\$@"; }
+claude()   { _om_wrap claude   "\$@"; }
+codex()    { _om_wrap codex    "\$@"; }
+gemini()   { _om_wrap gemini   "\$@"; }
+opencode() { _om_wrap opencode "\$@"; }
 
 # Cleanup: decrement counter when terminal closes
 zshexit() {
@@ -72,5 +73,5 @@ echo "  2. Set environment variables (optional):"
 echo "     export OPENMEMORY_DIR=\$HOME/OpenMemory/packages/openmemory-js"
 echo "     export OPENMEMORY_PORT=8080"
 echo ""
-echo "  3. Restart your terminal, then run claude, codex, or gemini"
+echo "  3. Restart your terminal, then run claude, opencode, codex, or gemini"
 echo "     OpenMemory will auto-start and auto-stop."
